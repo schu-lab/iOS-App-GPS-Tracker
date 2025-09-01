@@ -26,65 +26,77 @@ struct ContentView: View {
     @State private var flashTask: DispatchWorkItem? = nil   // cancel/replace banner timers
     
     var body: some View {
-        NavigationView {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 14) {
-                    header
-                    
-                    telemetryCard
-                    
-                    toggles
-                    
-                    // === Single row: three equal-width buttons ===
-                    HStack(spacing: 8) {
-                        Button {
-                            lm.resetAGLToCurrentAltitude()
-                            flashCopied("AGL reset")
-                        } label: {
-                            labelButton("Reset AGL Ground")
-                        }
-                        .frame(maxWidth: .infinity)
+        TabView {
+            // === Readout Tab ===
+            NavigationView {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 14) {
+                        header
+                        telemetryCard
+                        toggles
                         
-                        Button {
-                            UIPasteboard.general.string = simpleCoordsString()
-                            flashCopied("Copied coords")
-                        } label: {
-                            labelButton("Copy Coords")
+                        // === Single row: three equal-width buttons ===
+                        HStack(spacing: 8) {
+                            Button {
+                                lm.resetAGLToCurrentAltitude()
+                                flashCopied("AGL Reset")
+                            } label: {
+                                labelButton("Reset AGL Ref")
+                            }
+                            .frame(maxWidth: .infinity)
+                            
+                            Button {
+                                UIPasteboard.general.string = simpleCoordsString()
+                                flashCopied("Copied Coordinates")
+                            } label: {
+                                labelButton("Copy Coordinates")
+                            }
+                            .frame(maxWidth: .infinity)
+                            
+                            Button {
+                                UIPasteboard.general.string = fullInfoString()
+                                flashCopied("Copied Full Info")
+                            } label: {
+                                labelButton("Copy Full Info")
+                            }
+                            .frame(maxWidth: .infinity)
                         }
-                        .frame(maxWidth: .infinity)
-                        
-                        Button {
-                            UIPasteboard.general.string = fullInfoString()
-                            flashCopied("Copied full info")
-                        } label: {
-                            labelButton("Copy Full Info")
-                        }
-                        .frame(maxWidth: .infinity)
+                        .padding(.top, 2)
                     }
-                    .padding(.top, 2)
+                    .padding()
+                    .mono10() // apply mono theme to the whole screen
                 }
-                .padding()
-                .mono10() // apply mono theme to the whole screen
+                // Using a custom header; keep nav bar title empty
+                .navigationTitle("")
+                .navigationBarTitleDisplayMode(.inline)
             }
-            // Using a custom header; keep nav bar title empty
-            .navigationTitle("")
-            .navigationBarTitleDisplayMode(.inline)
-        }
-        .onAppear { lm.start() }
-        // === Flash banner: top-right ===
-        .overlay(alignment: .topTrailing) {
-            if let msg = flash {
-                Text(msg)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(.ultraThinMaterial, in: Capsule())
-                    .overlay(Capsule().stroke(.secondary.opacity(0.3)))
-                    .padding(.top, 10)
-                    .padding(.trailing, 12)
-                    .transition(.opacity.combined(with: .move(edge: .top)))
+            .onAppear { lm.start() }
+            // === Flash banner: top-right ===
+            .overlay(alignment: .topTrailing) {
+                if let msg = flash {
+                    Text(msg)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(.ultraThinMaterial, in: Capsule())
+                        .overlay(Capsule().stroke(.secondary.opacity(0.3)))
+                        .padding(.top, 10)
+                        .padding(.trailing, 12)
+                        .transition(.opacity.combined(with: .move(edge: .top)))
+                }
             }
+            .animation(.easeInOut(duration: 0.25), value: flash)
+            .tabItem {
+                Label("Readout", systemImage: "list.bullet.rectangle")
+            }
+
+            // === Map Manager Tab ===
+            MapManager(lm: lm)
+                .tabItem {
+                    Label("Map", systemImage: "map")
+                }
         }
-        .animation(.easeInOut(duration: 0.25), value: flash)
+        // enforce mono across the app
+        .environment(\.font, AppTheme.baseFont)
     }
     
     // MARK: - UI pieces
@@ -143,7 +155,7 @@ struct ContentView: View {
                 .mono10()
             HStack {
                 Picker("Units", selection: $useFeet) {
-                    Text("Meters").mono10().tag(false)    // <- force mono in each segment
+                    Text("Meters").mono10().tag(false)
                     Text("Feet").mono10().tag(true)
                 }
                 .pickerStyle(.segmented)
@@ -160,7 +172,7 @@ struct ContentView: View {
     
     private func labelButton(_ title: String) -> some View {
         Text(title)
-            .mono10()                    // <- force mono on button labels
+            .mono10()
             .lineLimit(1)
             .minimumScaleFactor(0.85)
             .padding(.horizontal, 10)
@@ -172,7 +184,6 @@ struct ContentView: View {
     // MARK: - Flash banner helper
     
     private func flashCopied(_ message: String, seconds: Double = 3.0) {
-        // cancel any existing timer
         flashTask?.cancel()
         flash = message
         let work = DispatchWorkItem { withAnimation { self.flash = nil } }
@@ -208,7 +219,6 @@ struct ContentView: View {
         let spA  = Maff.speedText(fromMS: lm.speedAvg10sMS, useFeet: useFeet)
         let time = Maff.timeText(date: lm.lastFix, mode: timeMode)
 
-        // Multi-line output, each field on its own line
         return """
         Latitude: \(latText)
         Longitude: \(lonText)
