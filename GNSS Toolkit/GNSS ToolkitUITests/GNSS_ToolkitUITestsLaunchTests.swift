@@ -1,13 +1,13 @@
 //
-//  iOS_App_GPS_TrackerUITestsLaunchTests.swift
-//  iOS-App-GPS-TrackerUITests
+//  GNSS_ToolkitUITestsLaunchTests.swift
+//  GNSS ToolkitUITests
 //
 //  Created by Simon Chu on 9/1/25.
 //
 
 import XCTest
 
-final class iOS_App_GPS_TrackerUITestsLaunchTests: XCTestCase {
+final class GNSS_ToolkitUITestsLaunchTests: XCTestCase {
 
     override class var runsForEachTargetApplicationUIConfiguration: Bool {
         true

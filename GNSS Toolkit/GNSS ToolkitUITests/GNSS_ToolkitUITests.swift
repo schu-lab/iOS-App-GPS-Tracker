@@ -1,13 +1,13 @@
 //
-//  iOS_App_GPS_TrackerUITests.swift
-//  iOS-App-GPS-TrackerUITests
+//  GNSS_ToolkitUITests.swift
+//  GNSS ToolkitUITests
 //
 //  Created by Simon Chu on 9/1/25.
 //
 
 import XCTest
 
-final class iOS_App_GPS_TrackerUITests: XCTestCase {
+final class GNSS_ToolkitUITests: XCTestCase {
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.

@@ -7,62 +7,62 @@
 	objects = {
 
 /* Begin PBXContainerItemProxy section */
-		91D269072E6625DB003C8BC6 /* PBXContainerItemProxy */ = {
+		91D269AC2E6637C3003C8BC6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 91D268F12E6625D9003C8BC6 /* Project object */;
+			containerPortal = 91D269962E6637C0003C8BC6 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 91D268F82E6625D9003C8BC6;
-			remoteInfo = "iOS-App-GPS-Tracker";
+			remoteGlobalIDString = 91D2699D2E6637C0003C8BC6;
+			remoteInfo = "GNSS Toolkit";
 		};
-		91D269112E6625DB003C8BC6 /* PBXContainerItemProxy */ = {
+		91D269B62E6637C3003C8BC6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 91D268F12E6625D9003C8BC6 /* Project object */;
+			containerPortal = 91D269962E6637C0003C8BC6 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 91D268F82E6625D9003C8BC6;
-			remoteInfo = "iOS-App-GPS-Tracker";
+			remoteGlobalIDString = 91D2699D2E6637C0003C8BC6;
+			remoteInfo = "GNSS Toolkit";
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		91D268F92E6625D9003C8BC6 /* iOS-App-GPS-Tracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "iOS-App-GPS-Tracker.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		91D269062E6625DB003C8BC6 /* iOS-App-GPS-TrackerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS-App-GPS-TrackerTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		91D269102E6625DB003C8BC6 /* iOS-App-GPS-TrackerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "iOS-App-GPS-TrackerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		91D2699E2E6637C0003C8BC6 /* GNSS Toolkit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "GNSS Toolkit.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		91D269AB2E6637C3003C8BC6 /* GNSS ToolkitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "GNSS ToolkitTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		91D269B52E6637C3003C8BC6 /* GNSS ToolkitUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "GNSS ToolkitUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		91D268FB2E6625D9003C8BC6 /* iOS-App-GPS-Tracker */ = {
+		91D269A02E6637C0003C8BC6 /* GNSS Toolkit */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "iOS-App-GPS-Tracker";
+			path = "GNSS Toolkit";
 			sourceTree = "<group>";
 		};
-		91D269092E6625DB003C8BC6 /* iOS-App-GPS-TrackerTests */ = {
+		91D269AE2E6637C3003C8BC6 /* GNSS ToolkitTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "iOS-App-GPS-TrackerTests";
+			path = "GNSS ToolkitTests";
 			sourceTree = "<group>";
 		};
-		91D269132E6625DB003C8BC6 /* iOS-App-GPS-TrackerUITests */ = {
+		91D269B82E6637C3003C8BC6 /* GNSS ToolkitUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "iOS-App-GPS-TrackerUITests";
+			path = "GNSS ToolkitUITests";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		91D268F62E6625D9003C8BC6 /* Frameworks */ = {
+		91D2699B2E6637C0003C8BC6 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		91D269032E6625DB003C8BC6 /* Frameworks */ = {
+		91D269A82E6637C3003C8BC6 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		91D2690D2E6625DB003C8BC6 /* Frameworks */ = {
+		91D269B22E6637C3003C8BC6 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -72,22 +72,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		91D268F02E6625D9003C8BC6 = {
+		91D269952E6637C0003C8BC6 = {
 			isa = PBXGroup;
 			children = (
-				91D268FB2E6625D9003C8BC6 /* iOS-App-GPS-Tracker */,
-				91D269092E6625DB003C8BC6 /* iOS-App-GPS-TrackerTests */,
-				91D269132E6625DB003C8BC6 /* iOS-App-GPS-TrackerUITests */,
-				91D268FA2E6625D9003C8BC6 /* Products */,
+				91D269A02E6637C0003C8BC6 /* GNSS Toolkit */,
+				91D269AE2E6637C3003C8BC6 /* GNSS ToolkitTests */,
+				91D269B82E6637C3003C8BC6 /* GNSS ToolkitUITests */,
+				91D2699F2E6637C0003C8BC6 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		91D268FA2E6625D9003C8BC6 /* Products */ = {
+		91D2699F2E6637C0003C8BC6 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				91D268F92E6625D9003C8BC6 /* iOS-App-GPS-Tracker.app */,
-				91D269062E6625DB003C8BC6 /* iOS-App-GPS-TrackerTests.xctest */,
-				91D269102E6625DB003C8BC6 /* iOS-App-GPS-TrackerUITests.xctest */,
+				91D2699E2E6637C0003C8BC6 /* GNSS Toolkit.app */,
+				91D269AB2E6637C3003C8BC6 /* GNSS ToolkitTests.xctest */,
+				91D269B52E6637C3003C8BC6 /* GNSS ToolkitUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,134 +95,134 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		91D268F82E6625D9003C8BC6 /* iOS-App-GPS-Tracker */ = {
+		91D2699D2E6637C0003C8BC6 /* GNSS Toolkit */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 91D2691A2E6625DB003C8BC6 /* Build configuration list for PBXNativeTarget "iOS-App-GPS-Tracker" */;
+			buildConfigurationList = 91D269BF2E6637C3003C8BC6 /* Build configuration list for PBXNativeTarget "GNSS Toolkit" */;
 			buildPhases = (
-				91D268F52E6625D9003C8BC6 /* Sources */,
-				91D268F62E6625D9003C8BC6 /* Frameworks */,
-				91D268F72E6625D9003C8BC6 /* Resources */,
+				91D2699A2E6637C0003C8BC6 /* Sources */,
+				91D2699B2E6637C0003C8BC6 /* Frameworks */,
+				91D2699C2E6637C0003C8BC6 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				91D268FB2E6625D9003C8BC6 /* iOS-App-GPS-Tracker */,
+				91D269A02E6637C0003C8BC6 /* GNSS Toolkit */,
 			);
-			name = "iOS-App-GPS-Tracker";
+			name = "GNSS Toolkit";
 			packageProductDependencies = (
 			);
-			productName = "iOS-App-GPS-Tracker";
-			productReference = 91D268F92E6625D9003C8BC6 /* iOS-App-GPS-Tracker.app */;
+			productName = "GNSS Toolkit";
+			productReference = 91D2699E2E6637C0003C8BC6 /* GNSS Toolkit.app */;
 			productType = "com.apple.product-type.application";
 		};
-		91D269052E6625DB003C8BC6 /* iOS-App-GPS-TrackerTests */ = {
+		91D269AA2E6637C3003C8BC6 /* GNSS ToolkitTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 91D2691D2E6625DB003C8BC6 /* Build configuration list for PBXNativeTarget "iOS-App-GPS-TrackerTests" */;
+			buildConfigurationList = 91D269C22E6637C3003C8BC6 /* Build configuration list for PBXNativeTarget "GNSS ToolkitTests" */;
 			buildPhases = (
-				91D269022E6625DB003C8BC6 /* Sources */,
-				91D269032E6625DB003C8BC6 /* Frameworks */,
-				91D269042E6625DB003C8BC6 /* Resources */,
+				91D269A72E6637C3003C8BC6 /* Sources */,
+				91D269A82E6637C3003C8BC6 /* Frameworks */,
+				91D269A92E6637C3003C8BC6 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				91D269082E6625DB003C8BC6 /* PBXTargetDependency */,
+				91D269AD2E6637C3003C8BC6 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				91D269092E6625DB003C8BC6 /* iOS-App-GPS-TrackerTests */,
+				91D269AE2E6637C3003C8BC6 /* GNSS ToolkitTests */,
 			);
-			name = "iOS-App-GPS-TrackerTests";
+			name = "GNSS ToolkitTests";
 			packageProductDependencies = (
 			);
-			productName = "iOS-App-GPS-TrackerTests";
-			productReference = 91D269062E6625DB003C8BC6 /* iOS-App-GPS-TrackerTests.xctest */;
+			productName = "GNSS ToolkitTests";
+			productReference = 91D269AB2E6637C3003C8BC6 /* GNSS ToolkitTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		91D2690F2E6625DB003C8BC6 /* iOS-App-GPS-TrackerUITests */ = {
+		91D269B42E6637C3003C8BC6 /* GNSS ToolkitUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 91D269202E6625DB003C8BC6 /* Build configuration list for PBXNativeTarget "iOS-App-GPS-TrackerUITests" */;
+			buildConfigurationList = 91D269C52E6637C3003C8BC6 /* Build configuration list for PBXNativeTarget "GNSS ToolkitUITests" */;
 			buildPhases = (
-				91D2690C2E6625DB003C8BC6 /* Sources */,
-				91D2690D2E6625DB003C8BC6 /* Frameworks */,
-				91D2690E2E6625DB003C8BC6 /* Resources */,
+				91D269B12E6637C3003C8BC6 /* Sources */,
+				91D269B22E6637C3003C8BC6 /* Frameworks */,
+				91D269B32E6637C3003C8BC6 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				91D269122E6625DB003C8BC6 /* PBXTargetDependency */,
+				91D269B72E6637C3003C8BC6 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				91D269132E6625DB003C8BC6 /* iOS-App-GPS-TrackerUITests */,
+				91D269B82E6637C3003C8BC6 /* GNSS ToolkitUITests */,
 			);
-			name = "iOS-App-GPS-TrackerUITests";
+			name = "GNSS ToolkitUITests";
 			packageProductDependencies = (
 			);
-			productName = "iOS-App-GPS-TrackerUITests";
-			productReference = 91D269102E6625DB003C8BC6 /* iOS-App-GPS-TrackerUITests.xctest */;
+			productName = "GNSS ToolkitUITests";
+			productReference = 91D269B52E6637C3003C8BC6 /* GNSS ToolkitUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		91D268F12E6625D9003C8BC6 /* Project object */ = {
+		91D269962E6637C0003C8BC6 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 1640;
 				TargetAttributes = {
-					91D268F82E6625D9003C8BC6 = {
+					91D2699D2E6637C0003C8BC6 = {
 						CreatedOnToolsVersion = 16.4;
 					};
-					91D269052E6625DB003C8BC6 = {
+					91D269AA2E6637C3003C8BC6 = {
 						CreatedOnToolsVersion = 16.4;
-						TestTargetID = 91D268F82E6625D9003C8BC6;
+						TestTargetID = 91D2699D2E6637C0003C8BC6;
 					};
-					91D2690F2E6625DB003C8BC6 = {
+					91D269B42E6637C3003C8BC6 = {
 						CreatedOnToolsVersion = 16.4;
-						TestTargetID = 91D268F82E6625D9003C8BC6;
+						TestTargetID = 91D2699D2E6637C0003C8BC6;
 					};
 				};
 			};
-			buildConfigurationList = 91D268F42E6625D9003C8BC6 /* Build configuration list for PBXProject "iOS-App-GPS-Tracker" */;
+			buildConfigurationList = 91D269992E6637C0003C8BC6 /* Build configuration list for PBXProject "GNSS Toolkit" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = 91D268F02E6625D9003C8BC6;
+			mainGroup = 91D269952E6637C0003C8BC6;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 91D268FA2E6625D9003C8BC6 /* Products */;
+			productRefGroup = 91D2699F2E6637C0003C8BC6 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				91D268F82E6625D9003C8BC6 /* iOS-App-GPS-Tracker */,
-				91D269052E6625DB003C8BC6 /* iOS-App-GPS-TrackerTests */,
-				91D2690F2E6625DB003C8BC6 /* iOS-App-GPS-TrackerUITests */,
+				91D2699D2E6637C0003C8BC6 /* GNSS Toolkit */,
+				91D269AA2E6637C3003C8BC6 /* GNSS ToolkitTests */,
+				91D269B42E6637C3003C8BC6 /* GNSS ToolkitUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		91D268F72E6625D9003C8BC6 /* Resources */ = {
+		91D2699C2E6637C0003C8BC6 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		91D269042E6625DB003C8BC6 /* Resources */ = {
+		91D269A92E6637C3003C8BC6 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		91D2690E2E6625DB003C8BC6 /* Resources */ = {
+		91D269B32E6637C3003C8BC6 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -232,21 +232,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		91D268F52E6625D9003C8BC6 /* Sources */ = {
+		91D2699A2E6637C0003C8BC6 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		91D269022E6625DB003C8BC6 /* Sources */ = {
+		91D269A72E6637C3003C8BC6 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		91D2690C2E6625DB003C8BC6 /* Sources */ = {
+		91D269B12E6637C3003C8BC6 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -256,20 +256,20 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		91D269082E6625DB003C8BC6 /* PBXTargetDependency */ = {
+		91D269AD2E6637C3003C8BC6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 91D268F82E6625D9003C8BC6 /* iOS-App-GPS-Tracker */;
-			targetProxy = 91D269072E6625DB003C8BC6 /* PBXContainerItemProxy */;
+			target = 91D2699D2E6637C0003C8BC6 /* GNSS Toolkit */;
+			targetProxy = 91D269AC2E6637C3003C8BC6 /* PBXContainerItemProxy */;
 		};
-		91D269122E6625DB003C8BC6 /* PBXTargetDependency */ = {
+		91D269B72E6637C3003C8BC6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 91D268F82E6625D9003C8BC6 /* iOS-App-GPS-Tracker */;
-			targetProxy = 91D269112E6625DB003C8BC6 /* PBXContainerItemProxy */;
+			target = 91D2699D2E6637C0003C8BC6 /* GNSS Toolkit */;
+			targetProxy = 91D269B62E6637C3003C8BC6 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		91D269182E6625DB003C8BC6 /* Debug */ = {
+		91D269BD2E6637C3003C8BC6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -333,7 +333,7 @@
 			};
 			name = Debug;
 		};
-		91D269192E6625DB003C8BC6 /* Release */ = {
+		91D269BE2E6637C3003C8BC6 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -390,7 +390,7 @@
 			};
 			name = Release;
 		};
-		91D2691B2E6625DB003C8BC6 /* Debug */ = {
+		91D269C02E6637C3003C8BC6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -410,7 +410,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "PlutoSpaceLab.iOS-App-GPS-Tracker";
+				PRODUCT_BUNDLE_IDENTIFIER = "PlutoSpaceLab.GNSS-Toolkit";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -418,7 +418,7 @@
 			};
 			name = Debug;
 		};
-		91D2691C2E6625DB003C8BC6 /* Release */ = {
+		91D269C12E6637C3003C8BC6 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -438,7 +438,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "PlutoSpaceLab.iOS-App-GPS-Tracker";
+				PRODUCT_BUNDLE_IDENTIFIER = "PlutoSpaceLab.GNSS-Toolkit";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -446,7 +446,7 @@
 			};
 			name = Release;
 		};
-		91D2691E2E6625DB003C8BC6 /* Debug */ = {
+		91D269C32E6637C3003C8BC6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -456,16 +456,16 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "PlutoSpaceLab.iOS-App-GPS-TrackerTests";
+				PRODUCT_BUNDLE_IDENTIFIER = "PlutoSpaceLab.GNSS-ToolkitTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/iOS-App-GPS-Tracker.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/iOS-App-GPS-Tracker";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GNSS Toolkit.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/GNSS Toolkit";
 			};
 			name = Debug;
 		};
-		91D2691F2E6625DB003C8BC6 /* Release */ = {
+		91D269C42E6637C3003C8BC6 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -475,16 +475,16 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "PlutoSpaceLab.iOS-App-GPS-TrackerTests";
+				PRODUCT_BUNDLE_IDENTIFIER = "PlutoSpaceLab.GNSS-ToolkitTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/iOS-App-GPS-Tracker.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/iOS-App-GPS-Tracker";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GNSS Toolkit.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/GNSS Toolkit";
 			};
 			name = Release;
 		};
-		91D269212E6625DB003C8BC6 /* Debug */ = {
+		91D269C62E6637C3003C8BC6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -492,16 +492,16 @@
 				DEVELOPMENT_TEAM = FBSY6ZH292;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "PlutoSpaceLab.iOS-App-GPS-TrackerUITests";
+				PRODUCT_BUNDLE_IDENTIFIER = "PlutoSpaceLab.GNSS-ToolkitUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = "iOS-App-GPS-Tracker";
+				TEST_TARGET_NAME = "GNSS Toolkit";
 			};
 			name = Debug;
 		};
-		91D269222E6625DB003C8BC6 /* Release */ = {
+		91D269C72E6637C3003C8BC6 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -509,55 +509,55 @@
 				DEVELOPMENT_TEAM = FBSY6ZH292;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "PlutoSpaceLab.iOS-App-GPS-TrackerUITests";
+				PRODUCT_BUNDLE_IDENTIFIER = "PlutoSpaceLab.GNSS-ToolkitUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = "iOS-App-GPS-Tracker";
+				TEST_TARGET_NAME = "GNSS Toolkit";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		91D268F42E6625D9003C8BC6 /* Build configuration list for PBXProject "iOS-App-GPS-Tracker" */ = {
+		91D269992E6637C0003C8BC6 /* Build configuration list for PBXProject "GNSS Toolkit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				91D269182E6625DB003C8BC6 /* Debug */,
-				91D269192E6625DB003C8BC6 /* Release */,
+				91D269BD2E6637C3003C8BC6 /* Debug */,
+				91D269BE2E6637C3003C8BC6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		91D2691A2E6625DB003C8BC6 /* Build configuration list for PBXNativeTarget "iOS-App-GPS-Tracker" */ = {
+		91D269BF2E6637C3003C8BC6 /* Build configuration list for PBXNativeTarget "GNSS Toolkit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				91D2691B2E6625DB003C8BC6 /* Debug */,
-				91D2691C2E6625DB003C8BC6 /* Release */,
+				91D269C02E6637C3003C8BC6 /* Debug */,
+				91D269C12E6637C3003C8BC6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		91D2691D2E6625DB003C8BC6 /* Build configuration list for PBXNativeTarget "iOS-App-GPS-TrackerTests" */ = {
+		91D269C22E6637C3003C8BC6 /* Build configuration list for PBXNativeTarget "GNSS ToolkitTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				91D2691E2E6625DB003C8BC6 /* Debug */,
-				91D2691F2E6625DB003C8BC6 /* Release */,
+				91D269C32E6637C3003C8BC6 /* Debug */,
+				91D269C42E6637C3003C8BC6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		91D269202E6625DB003C8BC6 /* Build configuration list for PBXNativeTarget "iOS-App-GPS-TrackerUITests" */ = {
+		91D269C52E6637C3003C8BC6 /* Build configuration list for PBXNativeTarget "GNSS ToolkitUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				91D269212E6625DB003C8BC6 /* Debug */,
-				91D269222E6625DB003C8BC6 /* Release */,
+				91D269C62E6637C3003C8BC6 /* Debug */,
+				91D269C72E6637C3003C8BC6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 91D268F12E6625D9003C8BC6 /* Project object */;
+	rootObject = 91D269962E6637C0003C8BC6 /* Project object */;
 }

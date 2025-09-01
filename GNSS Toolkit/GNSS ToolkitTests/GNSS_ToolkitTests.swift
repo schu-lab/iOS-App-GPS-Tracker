@@ -1,14 +1,14 @@
 //
-//  iOS_App_GPS_TrackerTests.swift
-//  iOS-App-GPS-TrackerTests
+//  GNSS_ToolkitTests.swift
+//  GNSS ToolkitTests
 //
 //  Created by Simon Chu on 9/1/25.
 //
 
 import Testing
-@testable import iOS_App_GPS_Tracker
+@testable import GNSS_Toolkit
 
-struct iOS_App_GPS_TrackerTests {
+struct GNSS_ToolkitTests {
 
     @Test func example() async throws {
         // Write your test here and use APIs like `#expect(...)` to check expected conditions.
