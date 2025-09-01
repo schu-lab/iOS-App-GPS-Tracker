@@ -12,6 +12,8 @@ struct GNSS_ToolkitApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                // Set a default font for the entire view hierarchy
+                .environment(\.font, AppTheme.baseFont)
         }
     }
 }
