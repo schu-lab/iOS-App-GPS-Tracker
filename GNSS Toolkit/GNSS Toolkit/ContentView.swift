@@ -64,7 +64,7 @@ struct ContentView: View {
                     .padding(.top, 2)
                 }
                 .padding()
-                .mono10()
+                .mono10() // apply mono theme to the whole screen
             }
             // Using a custom header; keep nav bar title empty
             .navigationTitle("")
@@ -138,17 +138,19 @@ struct ContentView: View {
     
     private var toggles: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Display Options").foregroundStyle(.secondary)
+            Text("Display Options")
+                .foregroundStyle(.secondary)
+                .mono10()
             HStack {
                 Picker("Units", selection: $useFeet) {
-                    Text("Meters").tag(false)
-                    Text("Feet").tag(true)
+                    Text("Meters").mono10().tag(false)    // <- force mono in each segment
+                    Text("Feet").mono10().tag(true)
                 }
                 .pickerStyle(.segmented)
                 
                 Picker("Time", selection: $timeModeRaw) {
-                    Text("UTC").tag(Maff.TimeMode.utc.rawValue)
-                    Text("Local").tag(Maff.TimeMode.local.rawValue)
+                    Text("UTC").mono10().tag(Maff.TimeMode.utc.rawValue)
+                    Text("Local").mono10().tag(Maff.TimeMode.local.rawValue)
                 }
                 .pickerStyle(.segmented)
             }
@@ -158,8 +160,9 @@ struct ContentView: View {
     
     private func labelButton(_ title: String) -> some View {
         Text(title)
+            .mono10()                    // <- force mono on button labels
             .lineLimit(1)
-            .minimumScaleFactor(0.8) // fit long labels on smaller phones
+            .minimumScaleFactor(0.85)
             .padding(.horizontal, 10)
             .padding(.vertical, 8)
             .background(.thinMaterial, in: Capsule())

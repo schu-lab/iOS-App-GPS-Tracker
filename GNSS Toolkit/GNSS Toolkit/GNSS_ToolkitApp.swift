@@ -9,10 +9,15 @@ import SwiftUI
 
 @main
 struct GNSS_ToolkitApp: App {
+    init() {
+        // Force segmented pickers to use the mono font globally
+        AppTheme.applyAppearance()
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView()
-                // Set a default font for the entire view hierarchy
+                // optional: enforce mono across the app
                 .environment(\.font, AppTheme.baseFont)
         }
     }

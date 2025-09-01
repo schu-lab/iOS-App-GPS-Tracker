@@ -4,10 +4,6 @@
 //
 //  Created by Simon Chu on 9/1/25.
 //
-//
-//  LocationManager.swift
-//  GNSS Toolkit
-//
 
 import Foundation
 import CoreLocation
