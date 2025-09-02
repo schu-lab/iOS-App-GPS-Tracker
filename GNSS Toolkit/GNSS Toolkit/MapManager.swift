@@ -1,16 +1,20 @@
 //  MapManager.swift
 //  GNSS Toolkit
 //
-//  X5 Refactor:
-//  - Live "Me" marker persists after setting Origin
-//  - Controls HUD: geofence setpoint quick buttons
-//  - Removed "Set Info" HUD page
-//  - Geofence presets: +20km, +50km
-//  - Origin/Target tabs: Distance & Bearing from each point's perspective (and to Me)
-//  - Title block "Map Manager" with icon (matches Readout styling)
+//  X7 update:
+//  - Adds "Copy Map Info" button (Controls tab) that copies 15 requested fields
+//  - Adds top-right toast on copy (matches Readout styling)
+//  - Geofence edge deltas (#14, #15) are SIGNED: negative = inside, positive = outside
+//
+//  Prior notes:
+//  - Live "Me" stays visible after setting Origin
+//  - Geofence presets include 20km, 50km
+//  - Origin/Target tabs show distance/bearing/direction from their perspectives
+//  - Geofence draws as outline-only (no fill)
 
 import SwiftUI
 import MapKit
+import UIKit   // UIPasteboard for copy
 
 struct MapManager: View {
     @ObservedObject var lm: LocationManager
@@ -38,6 +42,10 @@ struct MapManager: View {
     @State private var fenceInputField: String = ""
     @State private var fenceRadiusMeters: Double? = nil
 
+    // Copy toast
+    @State private var flash: String? = nil
+    @State private var flashTask: DispatchWorkItem? = nil
+
     var body: some View {
         ZStack {
             mapLayer
@@ -63,8 +71,8 @@ struct MapManager: View {
                 Spacer()
             }
 
-            // Top-right center button
-            VStack {
+            // Top-right center button + copy toast
+            VStack(alignment: .trailing, spacing: 6) {
                 HStack {
                     Spacer()
                     Button { centerOnMe() } label: {
@@ -80,8 +88,19 @@ struct MapManager: View {
                 }
                 .padding(.top, 2)
 
+                if let msg = flash {
+                    Text(msg)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(.ultraThinMaterial, in: Capsule())
+                        .overlay(Capsule().stroke(.secondary.opacity(0.3)))
+                        .padding(.trailing, 12)
+                        .transition(.opacity.combined(with: .move(edge: .top)))
+                }
+
                 Spacer()
             }
+            .animation(.easeInOut(duration: 0.25), value: flash)
             .allowsHitTesting(true)
 
             // Bottom HUD
@@ -100,7 +119,7 @@ struct MapManager: View {
     private var mapLayer: some View {
         MapReader { proxy in
             Map(position: $camera, interactionModes: .all) {
-                // Live "Me" annotation (always on if we have a fix)
+                // Live "Me" annotation
                 if let me = meCoord {
                     Annotation("Me", coordinate: me) {
                         ZStack {
@@ -138,7 +157,6 @@ struct MapManager: View {
                 if let dashed = originToMePolyline {
                     MapPolyline(dashed)
                         .stroke(.blue.opacity(0.8), style: StrokeStyle(lineWidth: 1.5, dash: [6, 6]))
-
                         .foregroundStyle(.blue.opacity(0.8))
                 }
                 // Geofence (outline-only)
@@ -201,6 +219,8 @@ struct MapManager: View {
                     Button(action: { setOriginFromCurrentFix() }) { labelButton("Set Origin") }
                     Button(action: { origin = nil }) { labelButton("Clear Origin") }
                     Button(action: { target = nil }) { labelButton("Clear Target") }
+                    // NEW: Copy Map Info
+                    Button(action: copyMapInfo) { labelButton("Copy Map Info") }
                 }
             }
 
@@ -258,7 +278,7 @@ struct MapManager: View {
                 .buttonStyle(.bordered)
             }
 
-            // Presets on next line (+20km, +50km)
+            // Presets
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     quickButton("100m", meters: 100)
@@ -303,7 +323,6 @@ struct MapManager: View {
         let aglStr  = Maff.distanceText(fromMeters: p?.agl, useFeet: useFeet)
         let timeStr = Maff.timeText(date: p?.timestamp, mode: mode)
 
-        // Distances/bearings for the main ask
         // 1) Origin card -> from Origin to Target
         let originToTarget = isOriginCard ? distBearing(from: origin, to: target) : .empty(useFeet: useFeet)
 
@@ -344,9 +363,8 @@ struct MapManager: View {
 
             Divider().opacity(0.25)
 
-            // === Main rows per your requirement ===
+            // Main rows
             if isOriginCard {
-                // Origin HUD: to Target from Origin
                 if originToTarget.hasAny {
                     row("To Target (dist)", originToTarget.distanceText)
                     row("Bearing",          originToTarget.bearingText)
@@ -355,7 +373,6 @@ struct MapManager: View {
                     row("To Target", "--")
                 }
             } else {
-                // Target HUD: from Me to Target
                 if meToTarget.hasAny {
                     row("From Me (dist)", meToTarget.distanceText)
                     row("Bearing",        meToTarget.bearingText)
@@ -364,15 +381,12 @@ struct MapManager: View {
                     row("From Me", "--")
                 }
             }
-            // ======================================
-
         }
         .padding(12)
         .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(.thinMaterial))
         .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(.secondary.opacity(0.15), lineWidth: 1))
         .mono10()
     }
-
 
     // MARK: - Small UI helpers
     private func row(_ label: String, _ value: String) -> some View {
@@ -474,6 +488,83 @@ struct MapManager: View {
         }
     }
 
+    // MARK: - Copy Map Info (15 items)
+    private func copyMapInfo() {
+        UIPasteboard.general.string = mapCopyString()
+        flashToast("Copied Map Info")
+    }
+
+    // Signed distance helper: negative = inside, positive = outside
+    private func signedText(fromMeters meters: Double?) -> String {
+        guard let meters else { return "--" }
+        let (v, unit) = Maff.distance(meters, useFeet: useFeet)
+        return String(format: "%+.2f %@", v, unit)
+    }
+
+    private func mapCopyString() -> String {
+        // 1–6: Origin/Target Lat/Long + MSL/AGL
+        let oLatLon = origin.map { "\(fmt($0.lat)), \(fmt($0.lon))" } ?? "--"
+        let oMSL    = Maff.distanceText(fromMeters: origin?.msl, useFeet: useFeet)
+        let oAGL    = Maff.distanceText(fromMeters: origin?.agl, useFeet: useFeet)
+
+        let tLatLon = target.map { "\(fmt($0.lat)), \(fmt($0.lon))" } ?? "--"
+        let tMSL    = Maff.distanceText(fromMeters: target?.msl, useFeet: useFeet)
+        let tAGL    = Maff.distanceText(fromMeters: target?.agl, useFeet: useFeet)
+
+        // 7–9: To Target from Origin
+        let o2t = distBearing(from: origin, to: target)
+
+        // 10–12: To Target from Current Position
+        let me2t: DeltaInfo = {
+            guard let me = meCoord, let t = target else { return .empty(useFeet: useFeet) }
+            let m = Haversine.distanceMeters(from: me, to: t.coordinate)
+            let b = Bearing.initialDegrees(from: me, to: t.coordinate)
+            return .make(distanceMeters: m, bearingDegrees: b, useFeet: useFeet)
+        }()
+
+        // 13–15: Geofence radius + SIGNED distances to edge (Target, Me)
+        let fenceText = Maff.distanceText(fromMeters: fenceRadiusMeters, useFeet: useFeet)
+
+        // Distances from Origin to Target/Me (for edge deltas)
+        let dOT = (origin != nil && target != nil)
+            ? Haversine.distanceMeters(from: origin!.coordinate, to: target!.coordinate)
+            : nil
+        let dOM = (origin != nil && meCoord != nil)
+            ? Haversine.distanceMeters(from: origin!.coordinate, to: meCoord!)
+            : nil
+
+        // Signed edge deltas (point distance - radius): negative = inside, positive = outside
+        let edgeTargetSigned = (fenceRadiusMeters != nil && dOT != nil) ? (dOT! - fenceRadiusMeters!) : nil
+        let edgeMeSigned     = (fenceRadiusMeters != nil && dOM != nil) ? (dOM! - fenceRadiusMeters!) : nil
+
+        // Build 15 lines
+        return """
+        1. Origin Lat / Long: \(oLatLon)
+        2. Origin MSL: \(oMSL)
+        3. Origin AGL: \(oAGL)
+        4. Target Lat / Long: \(tLatLon)
+        5. Target MSL: \(tMSL)
+        6. Target AGL: \(tAGL)
+        7. To Target Distance from Origin: \(o2t.distanceText)
+        8. To Target Bearing from Origin: \(o2t.bearingText)
+        9. To Target Direction from Origin: \(o2t.cardinal)
+        10. To Target Distance from Current Position: \(me2t.distanceText)
+        11. To Target Bearing from Current Position: \(me2t.bearingText)
+        12. To Target Direction from Current Position: \(me2t.cardinal)
+        13. Geofence Radius: \(fenceText)
+        14. Distance from Geofence edge and Target: \(signedText(fromMeters: edgeTargetSigned))
+        15. Distance from Geofence edge and Current Position: \(signedText(fromMeters: edgeMeSigned))
+        """
+    }
+
+    private func flashToast(_ message: String, seconds: Double = 2.5) {
+        flashTask?.cancel()
+        flash = message
+        let work = DispatchWorkItem { withAnimation { self.flash = nil } }
+        flashTask = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + seconds, execute: work)
+    }
+
     // MARK: - Models & Math
     private struct PointInfo {
         let lat: Double
@@ -526,7 +617,7 @@ struct MapManager: View {
     }
 
     private enum Haversine {
-        static let R: Double = 6_371_000 // Earth radius in meters
+        static let R: Double = 6_371_000 // meters
         static func distanceMeters(from a: CLLocationCoordinate2D, to b: CLLocationCoordinate2D) -> Double {
             func rad(_ d: Double) -> Double { d * .pi / 180 }
             let dLat = rad(b.latitude - a.latitude)
@@ -547,7 +638,6 @@ struct MapManager: View {
             let y = sin(λ2 - λ1) * cos(φ2)
             let x = cos(φ1) * sin(φ2) - sin(φ1) * cos(φ2) * cos(λ2 - λ1)
             let θ = atan2(y, x)
-            // normalize to [0,360)
             return (deg(θ).truncatingRemainder(dividingBy: 360) + 360).truncatingRemainder(dividingBy: 360)
         }
         static func cardinal(from degs: Double) -> String {
