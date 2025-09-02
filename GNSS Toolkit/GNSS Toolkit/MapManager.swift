@@ -1,9 +1,9 @@
-//
 //  MapManager.swift
 //  GNSS Toolkit
 //
-//  Created by Simon Chu on 9/1/25.
-//
+//  Option B: full-bleed map (no NavigationStack), center-on-me overlay,
+//  HUD without pager arrows, Controls header actions, Geofence presets on
+//  their own line, and geofence outline-only (transparent fill).
 
 import SwiftUI
 import MapKit
@@ -27,58 +27,64 @@ struct MapManager: View {
     @State private var latlonField: String = ""
     @FocusState private var latlonFocused: Bool
 
-    // HUD page order: 0 Controls, 1 Geofence, 2 Set Info, 3 Origin, 4 Target
+    // HUD pages: 0 Controls, 1 Geofence, 2 Set Info, 3 Origin, 4 Target
     @State private var hudPage: Int = 0
-    private let hudLastIndex = 4
 
-    // Geofence: keep meters internally; accept/display in current unit
-    @State private var fenceInputField: String = ""      // user's numeric input (in current unit)
-    @State private var fenceRadiusMeters: Double? = nil  // active fence (meters)
+    // Geofence (meters internally)
+    @State private var fenceInputField: String = ""
+    @State private var fenceRadiusMeters: Double? = nil
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                mapLayer
+        ZStack {
+            mapLayer
 
-                // Header pinned high, map expands beneath
-                VStack(spacing: 8) {
-                    headerBar
-                    Spacer(minLength: 0)
+            // Top-right center button
+            VStack {
+                HStack {
+                    Spacer()
+                    Button { centerOnMe() } label: {
+                        Image(systemName: "location.fill")
+                            .imageScale(.medium)
+                            .padding(12)
+                            .background(.ultraThinMaterial, in: Circle())
+                            .overlay(Circle().stroke(.secondary.opacity(0.25)))
+                            .frame(minWidth: 44, minHeight: 44)
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.trailing, 12)
                 }
-                .padding(.horizontal)
-                .padding(.top, 6)
+                .padding(.top, 2)
 
-                // HUD pinned near bottom
-                VStack(spacing: 10) {
-                    Spacer(minLength: 0)
-                    hud
-                }
-                .padding(.horizontal)
-                .padding(.bottom, 10)
+                Spacer()
             }
-            .navigationTitle("") // custom header
-            .navigationBarTitleDisplayMode(.inline)
+            .allowsHitTesting(true)
+
+            // Bottom HUD
+            VStack(spacing: 10) {
+                Spacer(minLength: 0)
+                hud
+            }
+            .padding(.horizontal)
+            .padding(.bottom, 10)
         }
         .environment(\.font, AppTheme.baseFont)
     }
 
-    // MARK: - Map
-
+    // MARK: - Map layer
     @ViewBuilder
     private var mapLayer: some View {
         MapReader { proxy in
             Map(position: $camera, interactionModes: .all) {
-                // Origin annotation (blue downward triangle)
+                // Origin annotation
                 if let o = origin {
                     Annotation("Origin", coordinate: o.coordinate) {
                         Image(systemName: "triangle.fill")
-                            .rotationEffect(.degrees(180)) // point down
+                            .rotationEffect(.degrees(180))
                             .foregroundStyle(.blue)
                             .shadow(radius: 2)
                     }
                 }
-
-                // Target annotation (red downward triangle)
+                // Target annotation
                 if let t = target {
                     Annotation("Target", coordinate: t.coordinate) {
                         Image(systemName: "triangle.fill")
@@ -87,22 +93,16 @@ struct MapManager: View {
                             .shadow(radius: 2)
                     }
                 }
-
-                // Distance line (solid orange)
+                // Line between origin and target
                 if let line = linePolyline {
                     MapPolyline(line)
                         .stroke(.orange, lineWidth: 2)
                 }
-
-                // Geofence: dotted red circle + outside red overlay
+                // Geofence (outline-only)
                 if let o = origin, let r = fenceRadiusMeters, r > 0 {
                     MapCircle(center: o.coordinate, radius: r)
-                        .stroke(.red, style: StrokeStyle(lineWidth: 2, dash: [6, 6]))
-
-                    if let maskPolygon = geofenceOutsidePolygon(center: o.coordinate, radius: r) {
-                        MapPolygon(maskPolygon)
-                            .foregroundStyle(Color.red.opacity(0.15))
-                    }
+                        .stroke(.red, lineWidth: 2)
+                        .foregroundStyle(.clear)
                 }
             }
             .onMapCameraChange { _ in
@@ -113,7 +113,7 @@ struct MapManager: View {
                     withAnimation(.easeInOut) { camera = .region(reg) }
                 }
             }
-            // Long-press anywhere to set the target point
+            // Long-press + slight drag to drop Target
             .gesture(
                 LongPressGesture(minimumDuration: 0.35)
                     .sequenced(before: DragGesture(minimumDistance: 0))
@@ -129,91 +129,40 @@ struct MapManager: View {
                     }
             )
         }
-        .ignoresSafeArea(.keyboard) // map shouldn't jump when keyboard appears
-    }
-
-    // MARK: - Header (icon left, title higher, quick center on right)
-
-    private var headerBar: some View {
-        HStack(spacing: 8) {
-            Image("Icon-DEV")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 22, height: 22)
-                .clipShape(RoundedRectangle(cornerRadius: 4))
-                .overlay(RoundedRectangle(cornerRadius: 4).stroke(.secondary.opacity(0.3), lineWidth: 0.5))
-
-            Text("Map Manager")
-                .monoTitle()
-
-            Spacer()
-
-            // Quick "Center on Me" (top-right)
-            Button {
-                centerOnMe()
-            } label: {
-                Image(systemName: "location.fill")
-                    .imageScale(.medium)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(.thinMaterial, in: Capsule())
-                    .overlay(Capsule().stroke(.secondary.opacity(0.25)))
-            }
-            .buttonStyle(.plain)
-        }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 6)
-        .background(.ultraThinMaterial, in: Capsule())
-        .overlay(Capsule().stroke(.secondary.opacity(0.25)))
-        .mono10()
+        .ignoresSafeArea()
+        .ignoresSafeArea(.keyboard)
     }
 
     // MARK: - HUD
-
     private var hud: some View {
         VStack(spacing: 6) {
-            // wrap-aware little pager (tap to wrap; swipes still work normally)
-            HStack(spacing: 10) {
-                Button("◀︎") { prevHUD() }
-                    .mono10()
-                    .padding(.horizontal, 8).padding(.vertical, 4)
-                    .background(.thinMaterial, in: Capsule())
-                    .overlay(Capsule().stroke(.secondary.opacity(0.25)))
-
-                Spacer()
-
-                Button("▶︎") { nextHUD() }
-                    .mono10()
-                    .padding(.horizontal, 8).padding(.vertical, 4)
-                    .background(.thinMaterial, in: Capsule())
-                    .overlay(Capsule().stroke(.secondary.opacity(0.25)))
-            }
-            .padding(.horizontal, 6)
-
             TabView(selection: $hudPage) {
-                controlCard.tag(0)     // Controls FIRST
-                fenceCard.tag(1)       // Geofence SECOND
-                setInfoCard.tag(2)     // Set Info THIRD (incl geofence dist)
-                hudCard(for: origin, title: "Origin").tag(3)
-                hudCard(for: target, title: "Target").tag(4)
+                controlCard.tag(0)
+                fenceCard.tag(1)
+                setInfoCard.tag(2)
+                hudCard(for: origin, title: "Origin", isOriginCard: true).tag(3)
+                hudCard(for: target, title: "Target", isOriginCard: false).tag(4)
             }
             .tabViewStyle(.page(indexDisplayMode: .always))
-            .frame(maxHeight: 170)
+            .frame(maxHeight: 200)
         }
     }
 
-    // 0) Controls tab (Origin + Target inputs)
+    // Controls card
     private var controlCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Controls").monoTitle()
-
-            HStack {
-                Button(action: { setOriginFromCurrentFix() }) {
-                    labelButton("Get Origin (from current)")
+        VStack(alignment: .leading, spacing: 12) {
+            // Header: title left, actions right
+            HStack(spacing: 8) {
+                Text("Controls").monoTitle()
+                Spacer()
+                HStack(spacing: 8) {
+                    Button(action: { setOriginFromCurrentFix() }) { labelButton("Set Origin") }
+                    Button(action: { origin = nil }) { labelButton("Clear Origin") }
+                    Button(action: { target = nil }) { labelButton("Clear Target") }
                 }
-                .frame(maxWidth: .infinity)
             }
 
+            // Target entry
             HStack(spacing: 8) {
                 TextField("lat,lon  (e.g. 32.7153,-117.1573)", text: $latlonField)
                     .textFieldStyle(.roundedBorder)
@@ -225,18 +174,15 @@ struct MapManager: View {
                         latlonFocused = false
                     }
                 }
+                .buttonStyle(.bordered)
             }
 
-            HStack(spacing: 8) {
-                Button(action: { origin = nil }) {
-                    labelButton("Clear Origin")
-                }
-                .frame(maxWidth: .infinity)
-
-                Button(action: { target = nil }) {
-                    labelButton("Clear Target")
-                }
-                .frame(maxWidth: .infinity)
+            // Readouts
+            let d = delta
+            VStack(alignment: .leading, spacing: 6) {
+                row("Distance",  d.distanceText)
+                row("Bearing",   d.bearingText)
+                row("Direction", d.cardinal)
             }
         }
         .padding(12)
@@ -245,31 +191,17 @@ struct MapManager: View {
         .mono10()
     }
 
-    // 1) Geofence tab (unit-aware)
+    // Geofence card
     private var fenceCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Geofence").monoTitle()
-
-            VStack(alignment: .leading, spacing: 8) {
-                row("Origin", origin != nil ? "\(fmt(origin!.lat)), \(fmt(origin!.lon))" : "--")
-                row("Radius", fenceRadiusMeters.flatMap { Maff.distanceText(fromMeters: $0, useFeet: useFeet) } ?? "--")
-            }
-
+        VStack(alignment: .leading, spacing: 10) {
+            // Title + quick Set Origin
             HStack(spacing: 8) {
-                ForEach(presetDistancesDisplay, id: \.self) { label in
-                    Button(label) {
-                        if let numeric = Double(label.filter("0123456789.".contains)) {
-                            fenceInputField = String(numeric)
-                        }
-                    }
-                    .mono10()
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 6)
-                    .background(.thinMaterial, in: Capsule())
-                    .overlay(Capsule().stroke(.secondary.opacity(0.25)))
-                }
+                Text("Geofence").monoTitle()
+                Spacer()
+                Button(action: { setOriginFromCurrentFix() }) { labelButton("Set Origin") }
             }
 
+            // Distance field row
             HStack(spacing: 8) {
                 TextField("Distance (\(currentUnitAbbrev))", text: $fenceInputField)
                     .keyboardType(.decimalPad)
@@ -283,6 +215,21 @@ struct MapManager: View {
                 }
                 .buttonStyle(.bordered)
             }
+
+            // Presets on next line
+            HStack(spacing: 8) {
+                quickButton("100m", meters: 100)
+                quickButton("500m", meters: 500)
+                quickButton("1km",  meters: 1_000)
+                quickButton("5km",  meters: 5_000)
+                quickButton("10km", meters: 10_000)
+            }
+
+            // Readouts
+            VStack(alignment: .leading, spacing: 6) {
+                row("Origin", origin != nil ? "\(fmt(origin!.lat)), \(fmt(origin!.lon))" : "--")
+                row("Radius", fenceRadiusMeters.flatMap { Maff.distanceText(fromMeters: $0, useFeet: useFeet) } ?? "--")
+            }
         }
         .padding(12)
         .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(.thinMaterial))
@@ -290,7 +237,18 @@ struct MapManager: View {
         .mono10()
     }
 
-    // 2) Set Info tab (delta + geofence info)
+    private func quickButton(_ title: String, meters: Double) -> some View {
+        Button(action: { setFenceQuick(meters: meters) }) {
+            Text(title)
+                .mono10()
+                .padding(.horizontal, 10)
+                .padding(.vertical, 8)
+                .background(.thinMaterial, in: Capsule())
+                .overlay(Capsule().stroke(.secondary.opacity(0.25)))
+        }
+    }
+
+    // Set Info card
     private var setInfoCard: some View {
         let d = delta
         let fenceText = fenceRadiusMeters.flatMap { Maff.distanceText(fromMeters: $0, useFeet: useFeet) } ?? "--"
@@ -310,8 +268,8 @@ struct MapManager: View {
         .mono10()
     }
 
-    // Reusable details card
-    private func hudCard(for p: PointInfo?, title: String) -> some View {
+    // Origin/Target details card
+    private func hudCard(for p: PointInfo?, title: String, isOriginCard: Bool) -> some View {
         let mode   = Maff.TimeMode(rawValue: timeModeRaw) ?? .utc
         let latStr  = p.map { fmt($0.lat) } ?? "--"
         let lonStr  = p.map { fmt($0.lon) } ?? "--"
@@ -319,11 +277,10 @@ struct MapManager: View {
         let aglStr  = Maff.distanceText(fromMeters: p?.agl, useFeet: useFeet)
         let timeStr = Maff.timeText(date: p?.timestamp, mode: mode)
 
-        return VStack(alignment: .leading, spacing: 8) {
+        return VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Text(title).monoTitle()
                 Spacer()
-                Text("◀︎ swipe ▶︎").foregroundStyle(.secondary).mono10()
             }
 
             HStack(alignment: .top, spacing: 12) {
@@ -339,6 +296,15 @@ struct MapManager: View {
                     row("UTC", timeStr)
                 }
             }
+
+            HStack(spacing: 8) {
+                if isOriginCard {
+                    Button(action: { setOriginFromCurrentFix() }) { labelButton("Set Origin") }
+                    Button(action: { origin = nil }) { labelButton("Clear Origin") }
+                } else {
+                    Button(action: { target = nil }) { labelButton("Clear Target") }
+                }
+            }
         }
         .padding(12)
         .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(.thinMaterial))
@@ -346,6 +312,7 @@ struct MapManager: View {
         .mono10()
     }
 
+    // MARK: - Small UI helpers
     private func row(_ label: String, _ value: String) -> some View {
         HStack {
             Text(label).foregroundStyle(.secondary)
@@ -365,36 +332,17 @@ struct MapManager: View {
             .overlay(Capsule().stroke(.secondary.opacity(0.25)))
     }
 
-    // MARK: - Pager wrap
-
-    private func nextHUD() {
-        hudPage = (hudPage + 1) > hudLastIndex ? 0 : (hudPage + 1)
-    }
-
-    private func prevHUD() {
-        hudPage = (hudPage - 1) < 0 ? hudLastIndex : (hudPage - 1)
-    }
-
-    // MARK: - Helpers
-
+    // MARK: - Actions/Logic
     private func setOriginFromCurrentFix() {
         guard let lat = lm.latitude, let lon = lm.longitude else { return }
-        origin = PointInfo(lat: lat,
-                           lon: lon,
-                           msl: lm.altitudeMSL,
-                           agl: lm.altitudeAGL,
-                           timestamp: lm.lastFix)
+        origin = PointInfo(lat: lat, lon: lon, msl: lm.altitudeMSL, agl: lm.altitudeAGL, timestamp: lm.lastFix)
         let span = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
         let reg  = MKCoordinateRegion(center: origin!.coordinate, span: span)
         withAnimation(.easeInOut) { camera = .region(reg) }
     }
 
     private func setTarget(from coord: CLLocationCoordinate2D, msl: Double?, agl: Double?, date: Date?) {
-        target = PointInfo(lat: coord.latitude,
-                           lon: coord.longitude,
-                           msl: msl,
-                           agl: agl,
-                           timestamp: date)
+        target = PointInfo(lat: coord.latitude, lon: coord.longitude, msl: msl, agl: agl, timestamp: date)
     }
 
     private func centerOnMe() {
@@ -420,44 +368,37 @@ struct MapManager: View {
     }
 
     private func parseLatLon(_ text: String) -> CLLocationCoordinate2D? {
-        // Accepts "lat,lon" with optional spaces
         let parts = text.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }
-        guard parts.count == 2, let lat = Double(parts[0]), let lon = Double(parts[1]),
-              abs(lat) <= 90, abs(lon) <= 180 else { return nil }
+        guard parts.count == 2, let lat = Double(parts[0]), let lon = Double(parts[1]), abs(lat) <= 90, abs(lon) <= 180 else { return nil }
         return .init(latitude: lat, longitude: lon)
     }
 
-    /// 6-decimal coordinate string (e.g., 32.715300)
     private func fmt(_ v: Double, decimals: Int = 6) -> String {
-        String(format: "%.\(decimals)f", v)
+        String(format: "% .\(decimals)f", v)
     }
-
-    // MARK: Geofence helpers (unit-aware)
 
     private var currentUnitAbbrev: String { useFeet ? "ft" : "m" }
 
-    private var presetDistancesDisplay: [String] {
-        useFeet ? ["100ft", "250ft", "500ft", "1000ft"]
-                : ["50m", "100m", "250m", "500m"]
-    }
-
-    /// Convert a numeric value in the CURRENT unit to meters.
     private func toMeters(fromCurrentUnit value: Double) -> Double {
         useFeet ? (value / Maff.feetPerMeter) : value
     }
 
-    private func applyFenceFromInput() {
-        guard origin != nil else {
-            fenceRadiusMeters = nil
-            return
-        }
-        guard let val = Double(fenceInputField), val > 0 else {
-            fenceRadiusMeters = nil
-            return
-        }
-        fenceRadiusMeters = toMeters(fromCurrentUnit: val)
+    private func setFenceQuick(meters: Double) {
+        guard origin != nil else { return }
+        fenceRadiusMeters = meters
+        let uiValue = useFeet ? (meters * Maff.feetPerMeter) : meters
+        fenceInputField = String(format: "%.0f", uiValue)
+        recenterForFence()
+    }
 
-        // (Optional) keep view centered on origin when fence changes
+    private func applyFenceFromInput() {
+        guard origin != nil else { fenceRadiusMeters = nil; return }
+        guard let val = Double(fenceInputField), val > 0 else { fenceRadiusMeters = nil; return }
+        fenceRadiusMeters = toMeters(fromCurrentUnit: val)
+        recenterForFence()
+    }
+
+    private func recenterForFence() {
         if let o = origin {
             let span = MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
             let reg  = MKCoordinateRegion(center: o.coordinate, span: span)
@@ -465,115 +406,65 @@ struct MapManager: View {
         }
     }
 
-    // Build an MKPolygon that fills most of the world with a circular "hole" for the fence
-    private func geofenceOutsidePolygon(center: CLLocationCoordinate2D, radius: Double) -> MKPolygon? {
-        let circlePoly = circlePolygon(center: center, radius: radius, points: 180)
-
-        // Big outer square (avoid poles for sanity)
-        let outer: [CLLocationCoordinate2D] = [
-            CLLocationCoordinate2D(latitude: 85,  longitude: -180),
-            CLLocationCoordinate2D(latitude: 85,  longitude:  180),
-            CLLocationCoordinate2D(latitude: -85, longitude:  180),
-            CLLocationCoordinate2D(latitude: -85, longitude: -180)
-        ]
-        let outerPoly = MKPolygon(coordinates: outer, count: outer.count, interiorPolygons: [circlePoly])
-        return outerPoly
+    // MARK: - Models & Math
+    private struct PointInfo {
+        let lat: Double
+        let lon: Double
+        let msl: Double?
+        let agl: Double?
+        let timestamp: Date?
+        var coordinate: CLLocationCoordinate2D { .init(latitude: lat, longitude: lon) }
     }
 
-    // Create a polygon approximating a circle on Earth’s surface
-    private func circlePolygon(center: CLLocationCoordinate2D, radius: Double, points: Int) -> MKPolygon {
-        let lat = center.latitude * .pi / 180
-        let lon = center.longitude * .pi / 180
-        let d   = radius / Haversine.R
+    private struct DeltaInfo {
+        let distanceMeters: Double?
+        let bearingDegrees: Double?
 
-        var coords: [CLLocationCoordinate2D] = []
-        coords.reserveCapacity(points)
-        for i in 0..<points {
-            let bearing = 2 * .pi * Double(i) / Double(points)
-            // spherical law of cosines
-            let lat2 = asin( sin(lat) * cos(d) + cos(lat) * sin(d) * cos(bearing) )
-            let lon2 = lon + atan2( sin(bearing) * sin(d) * cos(lat),
-                                    cos(d) - sin(lat) * sin(lat2) )
-            coords.append(CLLocationCoordinate2D(latitude: lat2 * 180 / .pi,
-                                                 longitude: lon2 * 180 / .pi))
+        let distanceText: String
+        let bearingText: String
+        let cardinal: String
+
+        static func empty(useFeet: Bool) -> DeltaInfo {
+            DeltaInfo(distanceMeters: nil, bearingDegrees: nil, distanceText: "--", bearingText: "--", cardinal: "--")
         }
-        return MKPolygon(coordinates: &coords, count: coords.count)
-    }
-}
 
-// MARK: - Models & Math
-
-private struct PointInfo {
-    let lat: Double
-    let lon: Double
-    let msl: Double?
-    let agl: Double?
-    let timestamp: Date?
-
-    var coordinate: CLLocationCoordinate2D { .init(latitude: lat, longitude: lon) }
-}
-
-private struct DeltaInfo {
-    let distanceMeters: Double?
-    let bearingDegrees: Double?
-
-    let distanceText: String
-    let bearingText: String
-    let cardinal: String
-
-    static func empty(useFeet: Bool) -> DeltaInfo {
-        DeltaInfo(distanceMeters: nil,
-                  bearingDegrees: nil,
-                  distanceText: "--",
-                  bearingText: "--",
-                  cardinal: "--")
+        static func make(distanceMeters: Double, bearingDegrees: Double, useFeet: Bool) -> DeltaInfo {
+            let dist = Maff.distanceText(fromMeters: distanceMeters, useFeet: useFeet)
+            let brg  = String(format: "%.1f°", bearingDegrees)
+            let card = Bearing.cardinal(from: bearingDegrees)
+            return .init(distanceMeters: distanceMeters, bearingDegrees: bearingDegrees, distanceText: dist, bearingText: brg, cardinal: card)
+        }
     }
 
-    static func make(distanceMeters: Double, bearingDegrees: Double, useFeet: Bool) -> DeltaInfo {
-        let dist = Maff.distanceText(fromMeters: distanceMeters, useFeet: useFeet)
-        let brg  = String(format: "%.1f°", bearingDegrees)
-        let card = Bearing.cardinal(from: bearingDegrees)
-        return .init(distanceMeters: distanceMeters,
-                     bearingDegrees: bearingDegrees,
-                     distanceText: dist,
-                     bearingText: brg,
-                     cardinal: card)
-    }
-}
-
-private enum Haversine {
-    static let R: Double = 6_371_000 // Earth radius in meters
-
-    static func distanceMeters(from a: CLLocationCoordinate2D, to b: CLLocationCoordinate2D) -> Double {
-        func rad(_ d: Double) -> Double { d * .pi / 180 }
-        let dLat = rad(b.latitude - a.latitude)
-        let dLon = rad(b.longitude - a.longitude)
-        let lat1 = rad(a.latitude), lat2 = rad(b.latitude)
-        let h = sin(dLat/2)*sin(dLat/2) + cos(lat1)*cos(lat2)*sin(dLon/2)*sin(dLon/2)
-        let c = 2 * atan2(sqrt(h), sqrt(1 - h))
-        return R * c
-    }
-}
-
-private enum Bearing {
-    static func initialDegrees(from a: CLLocationCoordinate2D, to b: CLLocationCoordinate2D) -> Double {
-        func rad(_ d: Double) -> Double { d * .pi / 180 }
-        func deg(_ r: Double) -> Double { r * 180 / .pi }
-        let φ1 = rad(a.latitude), φ2 = rad(b.latitude)
-        let λ1 = rad(a.longitude), λ2 = rad(b.longitude)
-        let y = sin(λ2 - λ1) * cos(φ2)
-        let x = cos(φ1) * sin(φ2) - sin(φ1) * cos(φ2) * cos(λ2 - λ1)
-        let θ = atan2(y, x)
-        let d = deg(θ)
-        // normalize to [0,360)
-        return (d.truncatingRemainder(dividingBy: 360) + 360).truncatingRemainder(dividingBy: 360)
+    private enum Haversine {
+        static let R: Double = 6_371_000 // Earth radius in meters
+        static func distanceMeters(from a: CLLocationCoordinate2D, to b: CLLocationCoordinate2D) -> Double {
+            func rad(_ d: Double) -> Double { d * .pi / 180 }
+            let dLat = rad(b.latitude - a.latitude)
+            let dLon = rad(b.longitude - a.longitude)
+            let lat1 = rad(a.latitude), lat2 = rad(b.latitude)
+            let h = sin(dLat/2)*sin(dLat/2) + cos(lat1)*cos(lat2)*sin(dLon/2)*sin(dLon/2)
+            let c = 2 * atan2(sqrt(h), sqrt(1 - h))
+            return R * c
+        }
     }
 
-    static func cardinal(from degs: Double) -> String {
-        // 16-wind compass
-        let dirs = ["N","NNE","NE","ENE","E","ESE","SE","SSE",
-                    "S","SSW","SW","WSW","W","WNW","NW","NNW"]
-        let idx = Int((degs/22.5).rounded()) % 16
-        return dirs[idx]
+    private enum Bearing {
+        static func initialDegrees(from a: CLLocationCoordinate2D, to b: CLLocationCoordinate2D) -> Double {
+            func rad(_ d: Double) -> Double { d * .pi / 180 }
+            func deg(_ r: Double) -> Double { r * 180 / .pi }
+            let φ1 = rad(a.latitude), φ2 = rad(b.latitude)
+            let λ1 = rad(a.longitude), λ2 = rad(b.longitude)
+            let y = sin(λ2 - λ1) * cos(φ2)
+            let x = cos(φ1) * sin(φ2) - sin(φ1) * cos(φ2) * cos(λ2 - λ1)
+            let θ = atan2(y, x)
+            // normalize to [0,360)
+            return (deg(θ).truncatingRemainder(dividingBy: 360) + 360).truncatingRemainder(dividingBy: 360)
+        }
+        static func cardinal(from degs: Double) -> String {
+            let dirs = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"]
+            let idx = Int((degs/22.5).rounded()) % 16
+            return dirs[idx]
+        }
     }
 }
