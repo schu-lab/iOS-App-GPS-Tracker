@@ -315,7 +315,7 @@ struct MapManager: View {
             return .make(distanceMeters: m, bearingDegrees: b, useFeet: useFeet)
         }()
 
-        return VStack(alignment: .leading, spacing: 10) {
+        return VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Text(title).monoTitle()
                 Spacer()
