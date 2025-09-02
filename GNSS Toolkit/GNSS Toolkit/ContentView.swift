@@ -1,8 +1,10 @@
+//
 //  ContentView.swift
 //  GNSS Toolkit
 //
-//  Refactored to add a third "Tracker" tab (MapTracker),
-//  and to start LocationManager at the top level so any tab can use it.
+//  Refactored to use TrackerMap (instead of MapTracker).
+//  LocationManager is started at the top level so all tabs can use it.
+//
 
 import SwiftUI
 import UIKit   // for UIPasteboard
@@ -22,7 +24,7 @@ struct ContentView: View {
     
     // Flash banner (top-right)
     @State private var flash: String? = nil
-    @State private var flashTask: DispatchWorkItem? = nil   // cancel/replace banner timers
+    @State private var flashTask: DispatchWorkItem? = nil
     
     var body: some View {
         TabView {
@@ -34,7 +36,7 @@ struct ContentView: View {
                         telemetryCard
                         toggles
                         
-                        // === Single row: three equal-width buttons ===
+                        // === Action buttons row ===
                         HStack(spacing: 8) {
                             Button {
                                 lm.resetAGLToCurrentAltitude()
@@ -63,13 +65,12 @@ struct ContentView: View {
                         .padding(.top, 2)
                     }
                     .padding()
-                    .mono10() // apply mono theme to the whole screen
+                    .mono10()
                 }
-                // Using a custom header; keep nav bar title empty
                 .navigationTitle("")
                 .navigationBarTitleDisplayMode(.inline)
             }
-            // === Flash banner: top-right ===
+            // Flash banner overlay
             .overlay(alignment: .topTrailing) {
                 if let msg = flash {
                     Text(msg)
@@ -93,8 +94,8 @@ struct ContentView: View {
                     Label("Map", systemImage: "map")
                 }
 
-            // === Map Tracker Tab (NEW) ===
-            MapTracker(lm: lm)
+            // === Tracker Map Tab (new) ===
+            TrackerMap(lm: lm)
                 .tabItem {
                     Label("Tracker", systemImage: "point.topleft.down.curvedto.point.bottomright.up")
                 }
@@ -114,9 +115,9 @@ struct ContentView: View {
                 .scaledToFit()
                 .frame(width: 22, height: 22)
                 .clipShape(RoundedRectangle(cornerRadius: 4))
-                .overlay(RoundedRectangle(cornerRadius: 4).stroke(.secondary.opacity(0.3), lineWidth: 0.5))
+                .overlay(RoundedRectangle(cornerRadius: 4).stroke(.secondary.opacity(0.3)))
             
-            Text("GNSS Toolkit")
+            Text("Location Manager")
                 .monoTitle()
             
             Spacer()
@@ -136,8 +137,7 @@ struct ContentView: View {
         }
         .padding(12)
         .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(.thinMaterial)
+            RoundedRectangle(cornerRadius: 12, style: .continuous).fill(.thinMaterial)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -210,9 +210,7 @@ struct ContentView: View {
     private var altitudeAGLText: String { Maff.distanceText(fromMeters: lm.altitudeAGL, useFeet: useFeet) }
     private var speedInstantText: String { Maff.speedText(fromMS: lm.speedInstantMS, useFeet: useFeet) }
     private var speedAvgText: String { Maff.speedText(fromMS: lm.speedAvg10sMS, useFeet: useFeet) }
-    private var timeText: String {
-        Maff.timeText(date: lm.lastFix, mode: timeMode)
-    }
+    private var timeText: String { Maff.timeText(date: lm.lastFix, mode: timeMode) }
     
     private func simpleCoordsString() -> String {
         Maff.coordsText(lat: lm.latitude, lon: lm.longitude)
