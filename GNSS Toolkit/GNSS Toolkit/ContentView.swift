@@ -1,9 +1,8 @@
-//
 //  ContentView.swift
 //  GNSS Toolkit
 //
-//  Created by Simon Chu on 9/1/25.
-//
+//  Refactored to add a third "Tracker" tab (MapTracker),
+//  and to start LocationManager at the top level so any tab can use it.
 
 import SwiftUI
 import UIKit   // for UIPasteboard
@@ -70,7 +69,6 @@ struct ContentView: View {
                 .navigationTitle("")
                 .navigationBarTitleDisplayMode(.inline)
             }
-            .onAppear { lm.start() }
             // === Flash banner: top-right ===
             .overlay(alignment: .topTrailing) {
                 if let msg = flash {
@@ -94,9 +92,17 @@ struct ContentView: View {
                 .tabItem {
                     Label("Map", systemImage: "map")
                 }
+
+            // === Map Tracker Tab (NEW) ===
+            MapTracker(lm: lm)
+                .tabItem {
+                    Label("Tracker", systemImage: "point.topleft.down.curvedto.point.bottomright.up")
+                }
         }
         // enforce mono across the app
         .environment(\.font, AppTheme.baseFont)
+        // Start location updates once at the top level (applies to all tabs)
+        .onAppear { lm.start() }
     }
     
     // MARK: - UI pieces
