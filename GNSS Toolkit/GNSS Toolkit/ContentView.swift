@@ -13,64 +13,90 @@ struct ContentView: View {
     
     // Persisted toggles
     @AppStorage("useFeet") private var useFeet = false
-    @AppStorage("useUTC") private var useUTC = true
+
+    // Time mode: "UTC" or "Local"
+    @AppStorage("timeMode") private var timeModeRaw: String = Maff.TimeMode.utc.rawValue
+    private var timeMode: Maff.TimeMode {
+        get { Maff.TimeMode(rawValue: timeModeRaw) ?? .utc }
+        set { timeModeRaw = newValue.rawValue }
+    }
     
-    // Ephemeral “Copied!” banner
+    // Flash banner (top-right)
     @State private var flash: String? = nil
+    @State private var flashTask: DispatchWorkItem? = nil   // cancel/replace banner timers
     
     var body: some View {
-        NavigationView {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 14) {
-                    header
-                    
-                    telemetryCard
-                    
-                    toggles
-                    
-                    HStack(spacing: 12) {
-                        Button(role: .none) {
-                            lm.resetAGLToCurrentAltitude()
-                        } label: {
-                            labelButton("Reset AGL Ground")
-                        }
+        TabView {
+            // === Readout Tab ===
+            NavigationView {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 14) {
+                        header
+                        telemetryCard
+                        toggles
                         
-                        Button {
-                            UIPasteboard.general.string = simpleCoordsString()
-                            flashCopied("Copied coords")
-                        } label: {
-                            labelButton("Copy Coords")
-                        }
-                    }
-                    
-                    Button {
-                        UIPasteboard.general.string = fullInfoString()
-                        flashCopied("Copied full info")
-                    } label: {
-                        labelButton("Copy Full Info")
+                        // === Single row: three equal-width buttons ===
+                        HStack(spacing: 8) {
+                            Button {
+                                lm.resetAGLToCurrentAltitude()
+                                flashCopied("AGL Reset")
+                            } label: {
+                                labelButton("Reset AGL Ref")
+                            }
                             .frame(maxWidth: .infinity)
+                            
+                            Button {
+                                UIPasteboard.general.string = simpleCoordsString()
+                                flashCopied("Copied Coordinates")
+                            } label: {
+                                labelButton("Copy Coordinates")
+                            }
+                            .frame(maxWidth: .infinity)
+                            
+                            Button {
+                                UIPasteboard.general.string = fullInfoString()
+                                flashCopied("Copied Full Info")
+                            } label: {
+                                labelButton("Copy Full Info")
+                            }
+                            .frame(maxWidth: .infinity)
+                        }
+                        .padding(.top, 2)
                     }
-                    .padding(.top, 2)
+                    .padding()
+                    .mono10() // apply mono theme to the whole screen
                 }
-                .padding()
-                .mono10()
+                // Using a custom header; keep nav bar title empty
+                .navigationTitle("")
+                .navigationBarTitleDisplayMode(.inline)
             }
-            .navigationTitle("")
-            .navigationBarTitleDisplayMode(.inline)
-        }
-        .onAppear { lm.start() }
-        .overlay(alignment: .top) {
-            if let msg = flash {
-                Text(msg)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
-                    .background(.ultraThinMaterial, in: Capsule())
-                    .overlay(Capsule().stroke(.secondary.opacity(0.3)))
-                    .padding(.top, 10)
-                    .transition(.opacity.combined(with: .move(edge: .top)))
+            .onAppear { lm.start() }
+            // === Flash banner: top-right ===
+            .overlay(alignment: .topTrailing) {
+                if let msg = flash {
+                    Text(msg)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(.ultraThinMaterial, in: Capsule())
+                        .overlay(Capsule().stroke(.secondary.opacity(0.3)))
+                        .padding(.top, 10)
+                        .padding(.trailing, 12)
+                        .transition(.opacity.combined(with: .move(edge: .top)))
+                }
             }
+            .animation(.easeInOut(duration: 0.25), value: flash)
+            .tabItem {
+                Label("Readout", systemImage: "list.bullet.rectangle")
+            }
+
+            // === Map Manager Tab ===
+            MapManager(lm: lm)
+                .tabItem {
+                    Label("Map", systemImage: "map")
+                }
         }
-        .animation(.easeInOut(duration: 0.25), value: flash)
+        // enforce mono across the app
+        .environment(\.font, AppTheme.baseFont)
     }
     
     // MARK: - UI pieces
@@ -83,10 +109,10 @@ struct ContentView: View {
                 .frame(width: 22, height: 22)
                 .clipShape(RoundedRectangle(cornerRadius: 4))
                 .overlay(RoundedRectangle(cornerRadius: 4).stroke(.secondary.opacity(0.3), lineWidth: 0.5))
-
+            
             Text("GNSS Toolkit")
                 .monoTitle()
-
+            
             Spacer()
         }
         .padding(.bottom, 2)
@@ -124,17 +150,19 @@ struct ContentView: View {
     
     private var toggles: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Display Options").foregroundStyle(.secondary)
+            Text("Display Options")
+                .foregroundStyle(.secondary)
+                .mono10()
             HStack {
                 Picker("Units", selection: $useFeet) {
-                    Text("Meters").tag(false)
-                    Text("Feet").tag(true)
+                    Text("Meters").mono10().tag(false)
+                    Text("Feet").mono10().tag(true)
                 }
                 .pickerStyle(.segmented)
                 
-                Picker("Time", selection: $useUTC) {
-                    Text("UTC").tag(true)
-                    Text("Local").tag(false)
+                Picker("Time", selection: $timeModeRaw) {
+                    Text("UTC").mono10().tag(Maff.TimeMode.utc.rawValue)
+                    Text("Local").mono10().tag(Maff.TimeMode.local.rawValue)
                 }
                 .pickerStyle(.segmented)
             }
@@ -145,56 +173,39 @@ struct ContentView: View {
     private func labelButton(_ title: String) -> some View {
         Text(title)
             .mono10()
-            .padding(.horizontal, 12)
+            .lineLimit(1)
+            .minimumScaleFactor(0.85)
+            .padding(.horizontal, 10)
             .padding(.vertical, 8)
             .background(.thinMaterial, in: Capsule())
             .overlay(Capsule().stroke(.secondary.opacity(0.25)))
     }
     
-    private func flashCopied(_ message: String) {
+    // MARK: - Flash banner helper
+    
+    private func flashCopied(_ message: String, seconds: Double = 3.0) {
+        flashTask?.cancel()
         flash = message
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
-            withAnimation { flash = nil }
-        }
+        let work = DispatchWorkItem { withAnimation { self.flash = nil } }
+        flashTask = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + seconds, execute: work)
     }
     
-    // MARK: - Text builders (now call Maff)
+    // MARK: - Text builders (use Maff)
     private var latText: String {
-        Maff.coordsText(lat: lm.latitude, lon: lm.longitude).split(separator: ",").first.map(String.init) ?? "--"
+        if let v = lm.latitude { return String(format: "%.6f", v) }
+        return "--"
     }
     private var lonText: String {
-        Maff.coordsText(lat: lm.latitude, lon: lm.longitude).split(separator: ",").last.map { $0.trimmingCharacters(in: .whitespaces) } ?? "--"
+        if let v = lm.longitude { return String(format: "%.6f", v) }
+        return "--"
     }
-    private var altitudeMSLText: String {
-        Maff.distanceText(fromMeters: lm.altitudeMSL, useFeet: useFeet)
-    }
-    private var altitudeAGLText: String {
-        Maff.distanceText(fromMeters: lm.altitudeAGL, useFeet: useFeet)
-    }
-    private var speedInstantText: String {
-        Maff.speedText(fromMS: lm.speedInstantMS, useFeet: useFeet)
-    }
-    private var speedAvgText: String {
-        Maff.speedText(fromMS: lm.speedAvg10sMS, useFeet: useFeet)
-    }
+    private var altitudeMSLText: String { Maff.distanceText(fromMeters: lm.altitudeMSL, useFeet: useFeet) }
+    private var altitudeAGLText: String { Maff.distanceText(fromMeters: lm.altitudeAGL, useFeet: useFeet) }
+    private var speedInstantText: String { Maff.speedText(fromMS: lm.speedInstantMS, useFeet: useFeet) }
+    private var speedAvgText: String { Maff.speedText(fromMS: lm.speedAvg10sMS, useFeet: useFeet) }
     private var timeText: String {
-        guard let t = lm.lastFix else { return "--" }
-        return formattedTime(t)
-    }
-    
-    private func formattedTime(_ date: Date) -> String {
-        if useUTC {
-            let df = ISO8601DateFormatter()
-            df.timeZone = TimeZone(secondsFromGMT: 0)
-            df.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-            return df.string(from: date)
-        } else {
-            let df = DateFormatter()
-            df.dateStyle = .medium
-            df.timeStyle = .medium
-            df.timeZone = .current
-            return df.string(from: date)
-        }
+        Maff.timeText(date: lm.lastFix, mode: timeMode)
     }
     
     private func simpleCoordsString() -> String {
@@ -202,12 +213,20 @@ struct ContentView: View {
     }
     
     private func fullInfoString() -> String {
-        let latlon = Maff.coordsText(lat: lm.latitude, lon: lm.longitude)
-        let msl = Maff.distanceText(fromMeters: lm.altitudeMSL, useFeet: useFeet)
-        let agl = Maff.distanceText(fromMeters: lm.altitudeAGL, useFeet: useFeet)
-        let spI = Maff.speedText(fromMS: lm.speedInstantMS, useFeet: useFeet)
-        let spA = Maff.speedText(fromMS: lm.speedAvg10sMS, useFeet: useFeet)
-        let time = lm.lastFix.map { formattedTime($0) } ?? "--"
-        return "Lat/Lon: \(latlon), Alt MSL: \(msl), Alt AGL: \(agl), Speed: \(spI) (avg10s \(spA)), Time: \(time)"
+        let msl  = Maff.distanceText(fromMeters: lm.altitudeMSL, useFeet: useFeet)
+        let agl  = Maff.distanceText(fromMeters: lm.altitudeAGL, useFeet: useFeet)
+        let spI  = Maff.speedText(fromMS: lm.speedInstantMS, useFeet: useFeet)
+        let spA  = Maff.speedText(fromMS: lm.speedAvg10sMS, useFeet: useFeet)
+        let time = Maff.timeText(date: lm.lastFix, mode: timeMode)
+
+        return """
+        Latitude: \(latText)
+        Longitude: \(lonText)
+        Alt MSL: \(msl)
+        Alt AGL: \(agl)
+        Speed (Instant): \(spI)
+        Speed (Avg 10s): \(spA)
+        Time: \(time)
+        """
     }
 }
